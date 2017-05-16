@@ -1,3 +1,10 @@
+###
+## Edit settings file of PlayerUnknown's Battlegrounds
+##
+##
+##
+###
+
 # Update settings file
 $SettingsLocation = $env:LOCALAPPDATA + "\TslGame\Saved\Config\WindowsNoEditor\"
 $SettingsFile = $SettingsLocation+'GameUserSettings.ini'
@@ -10,17 +17,27 @@ $MouseSensitivity = 'MouseSensitivity=58.000000'
 $FrameRateLimit = 'FrameRateLimit=100.000000'
 $FullscreenMode = 'FullscreenMode=1'
 
+# Settings regex
+$Settings = @(
+('(?=LastConvertedMouseSensitivity).+?\=\d+.\d+', $LastConvertedMouseSensitivity),
+('(?=ScreenScale).+?\=\d+.\d+', $ScreenScale),
+('(?=Gamma).+?\=\d+.\d+', $Gamma),
+('(?=MouseSensitivity).+?\=\d+.\d+', $MouseSensitivity),
+('(?=FrameRateLimit).+?\=\d+.\d+', $FrameRateLimit),
+('(?=FullscreenMode).+?\=\d', $FullscreenMode)
+)
+
+####
+## Don't change anything past this point
+####
 # Load settings file
 $SettingsFileContents = (Get-Content $SettingsFile)
 $NewSettingsFileContents = $SettingsFileContents
 # Replace current values with new values
-$NewSettingsFileContents = $NewSettingsFileContents -replace '(?=LastConvertedMouseSensitivity).+?\=\d+.\d+', $LastConvertedMouseSensitivity
-$NewSettingsFileContents = $NewSettingsFileContents -replace '(?=ScreenScale).+?\=\d+.\d+', $ScreenScale
-$NewSettingsFileContents = $NewSettingsFileContents -replace '(?=Gamma).+?\=\d+.\d+', $Gamma
-$NewSettingsFileContents = $NewSettingsFileContents -replace '(?=MouseSensitivity).+?\=\d+.\d+', $MouseSensitivity
-$NewSettingsFileContents = $NewSettingsFileContents -replace '(?=FrameRateLimit).+?\=\d+.\d+', $FrameRateLimit
-
-$NewSettingsFileContents = $NewSettingsFileContents -replace '(?=FullscreenMode).+?\=\d', $FullscreenMode
+foreach ($setting in $settings)
+{
+	$NewSettingsFileContents = $NewSettingsFileContents -replace $setting
+}
 
 write-output 'Preview new settings'
 $NewSettingsFileContents | Out-GridView -Wait
